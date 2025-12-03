@@ -18,8 +18,8 @@ def grade_assignment(data: GradeRequest):
 
     return {
         "student": data.student_name,
-        "score": result["score"],
-        "feedback": result["feedback"],
-        "strengths": result["strengths"],
-        "weaknesses": result["weaknesses"]
+        "score": result.get("score"),
+        "feedback": result.get("feedback"),
+        "strengths": result.get("strengths"),
+        "weaknesses": result.get("weaknesses")
     }
