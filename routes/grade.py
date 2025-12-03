@@ -1,51 +1,25 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 from pydantic import BaseModel
-from typing import List
-from services.ai_service import generate_ai_grade
+from services.ai_service import grade_essay_with_ai
 
 router = APIRouter()
 
 class GradeRequest(BaseModel):
-    student_name: str = "Unknown"
+    student_name: str
     assignment_text: str
-    rubric_json: str = "{}"
-
-class BatchGradeRequest(BaseModel):
-    assignments: List[GradeRequest]
-
+    rubric_json: str
 
 @router.post("/grade")
-def grade_single(req: GradeRequest):
-    """
-    Simple grading endpoint using placeholder AI logic.
-    """
-    try:
-        result = generate_ai_grade(req.assignment_text, req.rubric_json)
-        return {
-            "student": req.student_name,
-            "score": result.get("score"),
-            "feedback": result.get("feedback"),
-        }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+def grade_assignment(data: GradeRequest):
+    result = grade_essay_with_ai(
+        essay_text=data.assignment_text,
+        rubric_text=data.rubric_json
+    )
 
-
-@router.post("/grade/batch")
-def grade_batch(req: BatchGradeRequest):
-    """
-    Batch grading endpoint – simple loop over assignments.
-    """
-    try:
-        results = []
-        for a in req.assignments:
-            r = generate_ai_grade(a.assignment_text, a.rubric_json)
-            results.append(
-                {
-                    "student": a.student_name,
-                    "score": r.get("score"),
-                    "feedback": r.get("feedback"),
-                }
-            )
-        return {"results": results}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    return {
+        "student": data.student_name,
+        "score": result["score"],
+        "feedback": result["feedback"],
+        "strengths": result["strengths"],
+        "weaknesses": result["weaknesses"]
+    }
