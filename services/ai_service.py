@@ -1,7 +1,7 @@
 import os
 from openai import OpenAI
 
-client = OpenAI()
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 def grade_essay_with_ai(essay_text: str, rubric_text: str):
     prompt = f"""
@@ -29,13 +29,10 @@ Return ONLY valid JSON in this exact format:
 }}
 """
 
-    response = client.chat.completions.create(
+    completion = client.chat.completions.create(
         model="gpt-4.1-mini",
-        messages=[
-            {"role": "user", "content": prompt}
-        ],
+        messages=[{"role": "user", "content": prompt}],
         response_format={"type": "json_object"}
     )
 
-    # Extract JSON from the model
-    return response.choices[0].message.parsed
+    return completion.choices[0].message.parsed
