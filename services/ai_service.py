@@ -1,20 +1,38 @@
-# Simple placeholder AI grading logic.
-# Later, we can swap this for a real OpenAI-based implementation.
+from openai import OpenAI
+import os
 
-def generate_ai_grade(text: str, rubric_json: str):
-    words = len(text.split())
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-    if words > 300:
-        score = 90
-        feedback = "Well developed essay with ample evidence."
-    elif words > 150:
-        score = 75
-        feedback = "Good essay but could use more depth."
-    elif words > 50:
-        score = 60
-        feedback = "Basic ideas present but needs more development."
-    else:
-        score = 40
-        feedback = "Too short. Needs significant expansion and detail."
+def grade_essay_with_ai(essay_text: str, rubric_text: str):
+    prompt = f"""
+You are an expert English teacher. Grade the following essay according to the rubric.
 
-    return {"score": score, "feedback": feedback}
+### RUBRIC
+{rubric_text}
+
+### ESSAY
+{essay_text}
+
+### TASK
+1. Provide a holistic score from 0–100.
+2. Provide specific, constructive feedback.
+3. Provide 2 strengths.
+4. Provide 2 weaknesses.
+
+Return ONLY valid JSON in this format:
+
+{{
+  "score": <number>,
+  "feedback": "<string>",
+  "strengths": ["...", "..."],
+  "weaknesses": ["...", "..."]
+}}
+"""
+
+    response = client.responses.create(
+        model="gpt-4.1-mini",
+        input=prompt,
+        response_format="json"
+    )
+
+    return response.output_json
