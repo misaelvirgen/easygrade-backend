@@ -1,7 +1,7 @@
-from openai import OpenAI
 import os
+from openai import OpenAI
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+client = OpenAI()
 
 def grade_essay_with_ai(essay_text: str, rubric_text: str):
     prompt = f"""
@@ -19,7 +19,7 @@ You are an expert English teacher. Grade the following essay according to the ru
 3. Provide 2 strengths.
 4. Provide 2 weaknesses.
 
-Return ONLY valid JSON in this format:
+Return ONLY valid JSON in this exact format:
 
 {{
   "score": <number>,
@@ -29,10 +29,13 @@ Return ONLY valid JSON in this format:
 }}
 """
 
-    response = client.responses.create(
+    response = client.chat.completions.create(
         model="gpt-4.1-mini",
-        input=prompt,
-        response_format="json"
+        messages=[
+            {"role": "user", "content": prompt}
+        ],
+        response_format={"type": "json_object"}
     )
 
-    return response.output_json
+    # Extract JSON from the model
+    return response.choices[0].message.parsed
