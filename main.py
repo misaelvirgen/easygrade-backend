@@ -6,6 +6,8 @@ from routes.grade import router as grade_router
 from routes.upload_pdf import router as upload_pdf_router
 from routes.google_classroom import router as google_router
 from routes.canvas import router as canvas_router
+from routes import rubric
+
 
 app = FastAPI(title="EasyGrade Backend")
 
@@ -26,3 +28,4 @@ app.include_router(grade_router, prefix="/api")
 app.include_router(upload_pdf_router, prefix="/api")
 app.include_router(google_router, prefix="/api")
 app.include_router(canvas_router, prefix="/api")
+app.include_router(rubric.router, prefix="/api/rubric")

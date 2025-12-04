@@ -50,3 +50,37 @@ Return ONLY valid JSON in this exact format:
     )
 
     return completion.choices[0].message.parsed
+
+
+def generate_rubric_with_ai(prompt_text: str, grade_level: str):
+    prompt = f"""
+You are an expert curriculum designer. Create a clear, teacher-ready grading rubric for the following assignment prompt.
+
+### GRADE LEVEL
+{grade_level}
+
+### ASSIGNMENT PROMPT
+{prompt_text}
+
+### TASK
+Create a rubric with 3–5 criteria.  
+Each criterion should include:
+- Criterion Name
+- Description of expectations
+- Mastery levels: Excellent, Proficient, Developing, Needs Improvement
+
+Return ONLY valid JSON in this format:
+
+{{
+  "rubric": "<full rubric as multiline text>"
+}}
+"""
+
+    completion = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": prompt}],
+        response_format={"type": "json_object"}
+    )
+
+    parsed = completion.choices[0].message.parsed
+    return parsed.get("rubric")
