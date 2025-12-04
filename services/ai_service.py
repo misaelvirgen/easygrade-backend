@@ -3,21 +3,35 @@ from openai import OpenAI
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-def grade_essay_with_ai(essay_text: str, rubric_text: str):
+def grade_essay_with_ai(prompt_text: str, essay_text: str, rubric_text: str):
+    # If rubric is empty, give AI a default fallback rubric
+    rubric_block = rubric_text if rubric_text.strip() else """
+Score the essay using standard ELA writing criteria:
+- Clarity and Organization
+- Evidence and Reasoning
+- Style and Voice
+- Grammar and Conventions
+Each category should influence the final holistic score.
+"""
+
     prompt = f"""
-You are an expert English teacher. Grade the following essay according to the rubric.
+You are an expert English teacher. Evaluate the student’s essay based on the assignment prompt and rubric.
 
-### RUBRIC
-{rubric_text}
+### ASSIGNMENT PROMPT
+{prompt_text}
 
-### ESSAY
+### STUDENT ESSAY
 {essay_text}
 
+### RUBRIC (optional)
+{rubric_block}
+
 ### TASK
-1. Provide a holistic score from 0–100.
-2. Provide specific, constructive feedback.
-3. Provide 2 strengths.
-4. Provide 2 weaknesses.
+1. Determine how well the essay addresses the assignment prompt.
+2. Score the essay holistically from 0–100.
+3. Provide rubric-aligned feedback.
+4. Provide 2 strengths.
+5. Provide 2 weaknesses.
 
 Return ONLY valid JSON in this exact format:
 
