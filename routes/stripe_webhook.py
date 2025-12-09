@@ -1,3 +1,4 @@
+import os
 import stripe
 from fastapi import APIRouter, Request, Header
 from supabase import create_client
