@@ -7,3 +7,5 @@ python-dotenv
 requests
 PyMuPDF
 docx2txt
+stripe
+supabase
