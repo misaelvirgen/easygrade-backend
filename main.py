@@ -1,3 +1,6 @@
+from dotenv import load_dotenv
+load_dotenv()
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -8,7 +11,6 @@ from routes.google_classroom import router as google_router
 from routes.canvas import router as canvas_router
 from routes import rubric
 from routes import upload_rubric
-from routes.stripe_webhook import router as stripe_webhook_router   # <-- ADD THIS
 
 app = FastAPI(title="EasyGrade Backend")
 
@@ -30,6 +32,3 @@ app.include_router(google_router, prefix="/api")
 app.include_router(canvas_router, prefix="/api")
 app.include_router(rubric.router, prefix="/api/rubric")
 app.include_router(upload_rubric.router, prefix="/api/upload")
-
-# Stripe webhook route 
-app.include_router(stripe_webhook_router)
