@@ -13,9 +13,8 @@ def get_current_user(
     try:
         res = supabase.auth.get_user(token)
         return res.user
-    except Exception as e:
-        print("AUTH ERROR:", e)
+    except Exception:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=str(e),
+            detail="Invalid or expired authentication token",
         )
